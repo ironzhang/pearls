@@ -2,31 +2,29 @@ package lru
 
 import "container/list"
 
-type Key interface{}
-
 type Cache struct {
 	maxEntries int
 
-	onEvicted func(key Key, value interface{})
+	onEvicted func(key, value interface{})
 
 	ll    *list.List
-	cache map[Key]*list.Element
+	cache map[interface{}]*list.Element
 }
 
 type entry struct {
-	key   Key
+	key   interface{}
 	value interface{}
 }
 
-func New(maxEntries int, onEvicted func(key Key, value interface{})) *Cache {
+func New(maxEntries int, onEvicted func(key, value interface{})) *Cache {
 	return new(Cache).Init(maxEntries, onEvicted)
 }
 
-func (c *Cache) Init(maxEntries int, onEvicted func(key Key, value interface{})) *Cache {
+func (c *Cache) Init(maxEntries int, onEvicted func(key, value interface{})) *Cache {
 	c.maxEntries = maxEntries
 	c.onEvicted = onEvicted
 	c.ll = list.New()
-	c.cache = make(map[Key]*list.Element)
+	c.cache = make(map[interface{}]*list.Element)
 	return c
 }
 
@@ -34,7 +32,7 @@ func (c *Cache) Len() int {
 	return c.ll.Len()
 }
 
-func (c *Cache) Add(key Key, value interface{}) {
+func (c *Cache) Add(key, value interface{}) {
 	if le, ok := c.cache[key]; ok {
 		c.ll.MoveToFront(le)
 		le.Value.(*entry).value = value
@@ -47,7 +45,7 @@ func (c *Cache) Add(key Key, value interface{}) {
 	}
 }
 
-func (c *Cache) Get(key Key) (interface{}, bool) {
+func (c *Cache) Get(key interface{}) (interface{}, bool) {
 	if le, hit := c.cache[key]; hit {
 		c.ll.MoveToFront(le)
 		return le.Value.(*entry).value, true
@@ -55,7 +53,7 @@ func (c *Cache) Get(key Key) (interface{}, bool) {
 	return nil, false
 }
 
-func (c *Cache) Remove(key Key) {
+func (c *Cache) Remove(key interface{}) {
 	if le, hit := c.cache[key]; hit {
 		c.removeElement(le)
 	}
