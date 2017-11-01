@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -103,26 +102,27 @@ func TestTOMLConfig(t *testing.T) {
 	//fmt.Printf("%+v\n", got)
 }
 
-func ExampleLoadFromFile() {
-	type Config struct {
-		A int
-		B string
-		C float64
+func TestConfig(t *testing.T) {
+	tests := []struct {
+		filename  string
+		defaultLW config.LoadWriter
+	}{
+		{"test.config.json", config.JSON},
+		{"test.config.conf", config.TOML},
 	}
-
-	if err := config.WriteToFile("example.json", &Config{A: 1, B: "hello", C: 3.14}); err != nil {
-		fmt.Printf("write to file: %v", err)
-		return
+	for _, tt := range tests {
+		got, want := Config{}, example
+		config.Default = tt.defaultLW
+		if err := config.WriteToFile(tt.filename, want); err != nil {
+			t.Fatalf("%s: write to file: %v", tt.filename, err)
+		}
+		defer os.Remove(tt.filename)
+		if err := config.LoadFromFile(tt.filename, &got); err != nil {
+			t.Fatalf("%s: load from file: %v", tt.filename, err)
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("%+v != %+v", got, want)
+		}
+		//fmt.Printf("%+v\n", got)
 	}
-	defer os.Remove("example.json")
-
-	var cfg Config
-	if err := config.LoadFromFile("example.json", &cfg); err != nil {
-		fmt.Printf("load from file: %v", err)
-		return
-	}
-	fmt.Println(cfg)
-
-	// output:
-	// {1 hello 3.14}
 }

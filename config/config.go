@@ -8,6 +8,11 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type LoadWriter interface {
+	LoadFromFile(filename string, cfg interface{}) error
+	WriteToFile(filename string, cfg interface{}) error
+}
+
 type jsoncfg struct{}
 
 func (jsoncfg) LoadFromFile(filename string, cfg interface{}) error {
@@ -51,13 +56,16 @@ func (tomlcfg) WriteToFile(filename string, cfg interface{}) error {
 	return enc.Encode(cfg)
 }
 
-var JSON jsoncfg
-var TOML tomlcfg
+var (
+	JSON    jsoncfg
+	TOML    tomlcfg
+	Default LoadWriter = JSON
+)
 
 func LoadFromFile(filename string, cfg interface{}) error {
-	return JSON.LoadFromFile(filename, cfg)
+	return Default.LoadFromFile(filename, cfg)
 }
 
 func WriteToFile(filename string, cfg interface{}) error {
-	return JSON.WriteToFile(filename, cfg)
+	return Default.WriteToFile(filename, cfg)
 }
