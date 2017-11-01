@@ -3,7 +3,7 @@ package lru_test
 import (
 	"testing"
 
-	"github.com/ironzhang/matrix/lru"
+	"github.com/ironzhang/pearls/cache/lru"
 )
 
 var getTests = []struct {
