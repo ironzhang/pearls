@@ -2,6 +2,11 @@ package lru
 
 import "container/list"
 
+type entry struct {
+	key   interface{}
+	value interface{}
+}
+
 type Cache struct {
 	maxEntries int
 
@@ -9,11 +14,6 @@ type Cache struct {
 
 	ll    *list.List
 	cache map[interface{}]*list.Element
-}
-
-type entry struct {
-	key   interface{}
-	value interface{}
 }
 
 func New(maxEntries int, onEvicted func(key, value interface{})) *Cache {
