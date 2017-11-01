@@ -8,6 +8,7 @@ import (
 )
 
 func TestGet(t *testing.T) {
+	wait := 100 * time.Millisecond
 	tests := []struct {
 		name       string
 		keyToAdd   interface{}
@@ -16,9 +17,9 @@ func TestGet(t *testing.T) {
 		wait       time.Duration
 		expectedOK bool
 	}{
-		{"hit", "k1", "k1", time.Second, time.Second / 2, true},
-		{"nokey_miss", "k2", "nokey", time.Second, 0, false},
-		{"timeout_miss", "k3", "k3", time.Second, time.Second, false},
+		{"hit", "k1", "k1", wait, wait / 2, true},
+		{"nokey_miss", "k2", "nokey", wait, 0, false},
+		{"timeout_miss", "k3", "k3", wait, wait, false},
 	}
 
 	ttl := ttl.New(0, nil)
