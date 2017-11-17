@@ -59,3 +59,7 @@ func (c *Cache) getEntry(key interface{}) (entry, bool) {
 	}
 	return entry{}, false
 }
+
+func (c *Cache) Clear() {
+	c.lru.Clear()
+}
