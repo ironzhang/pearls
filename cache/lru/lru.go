@@ -74,3 +74,13 @@ func (c *Cache) removeElement(le *list.Element) {
 		c.onEvicted(kv.key, kv.value)
 	}
 }
+
+func (c *Cache) Clear() {
+	for {
+		le := c.ll.Back()
+		if le == nil {
+			break
+		}
+		c.removeElement(le)
+	}
+}
