@@ -20,11 +20,12 @@ func TestGet(t *testing.T) {
 		{"hit", "k1", "k1", wait, wait / 2, true},
 		{"nokey_miss", "k2", "nokey", wait, 0, false},
 		{"timeout_miss", "k3", "k3", wait, wait, false},
+		{"timeout_hit", "k4", "k4", 0, wait, true},
 	}
 
-	ttl := ttl.New(0, nil)
+	ttl := ttl.New(0, 0, nil)
 	for _, tt := range tests {
-		ttl.Add(tt.keyToAdd, 1234, tt.timeout)
+		ttl.AddWithTimeout(tt.keyToAdd, 1234, tt.timeout)
 		time.Sleep(tt.wait)
 		val, ok := ttl.Get(tt.keyToGet)
 		if got, want := ok, tt.expectedOK; got != want {

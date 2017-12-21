@@ -12,14 +12,16 @@ type entry struct {
 }
 
 type Cache struct {
-	lru lru.Cache
+	lru     lru.Cache
+	timeout time.Duration
 }
 
-func New(maxEntries int, onEvicted func(key, value interface{})) *Cache {
-	return new(Cache).Init(maxEntries, onEvicted)
+func New(timeout time.Duration, maxEntries int, onEvicted func(key, value interface{})) *Cache {
+	return new(Cache).Init(timeout, maxEntries, onEvicted)
 }
 
-func (c *Cache) Init(maxEntries int, onEvicted func(key, value interface{})) *Cache {
+func (c *Cache) Init(timeout time.Duration, maxEntries int, onEvicted func(key, value interface{})) *Cache {
+	c.timeout = timeout
 	c.lru.Init(maxEntries, onEvicted)
 	return c
 }
@@ -28,9 +30,16 @@ func (c *Cache) Len() int {
 	return c.lru.Len()
 }
 
-func (c *Cache) Add(key, value interface{}, timeout time.Duration) {
-	e := entry{value: value, deadline: time.Now().Add(timeout)}
-	c.lru.Add(key, e)
+func (c *Cache) Add(key, value interface{}) {
+	c.AddWithTimeout(key, value, c.timeout)
+}
+
+func (c *Cache) AddWithTimeout(key, value interface{}, timeout time.Duration) {
+	var deadline time.Time
+	if timeout > 0 {
+		deadline = time.Now().Add(timeout)
+	}
+	c.lru.Add(key, entry{value: value, deadline: deadline})
 }
 
 func (c *Cache) Get(key interface{}) (interface{}, bool) {
@@ -38,7 +47,7 @@ func (c *Cache) Get(key interface{}) (interface{}, bool) {
 	if !ok {
 		return nil, false
 	}
-	if time.Now().After(e.deadline) {
+	if !e.deadline.IsZero() && time.Now().After(e.deadline) {
 		c.lru.Remove(key)
 		return nil, false
 	}
