@@ -89,6 +89,10 @@ func TestBase58(t *testing.T) {
 	for i, tt := range tests {
 		encb := StdEncoding.Encode(tt)
 		decb := StdEncoding.Decode(encb)
-		t.Logf("%d: %v encode: %q", i, decb, encb)
+		if got, want := decb, tt; !bytes.Equal(got, want) {
+			t.Errorf("%d: encode(%v) decode: got %q, want %q", i, tt, got, want)
+		} else {
+			t.Logf("%d: encode(%v): %q, decode(%q): %v", i, tt, encb, encb, decb)
+		}
 	}
 }
