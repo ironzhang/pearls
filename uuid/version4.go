@@ -7,9 +7,8 @@ import (
 )
 
 // NewRandom returns a Random (Version 4) UUID
-func NewRandom() UUID {
-	uuid := make([]byte, 16)
-	randBytes(uuid)
+func NewRandom() (uuid UUID) {
+	randBytes(uuid[:])
 	uuid[6] = (uuid[6] & 0x0f) | 0x40 // Version 4
 	uuid[8] = (uuid[8] & 0x3f) | 0x80 // Variant is 10
 	return uuid

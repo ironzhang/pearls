@@ -2,11 +2,17 @@ package uuid
 
 import "encoding/hex"
 
-type UUID []byte
+type UUID [16]byte
 
 // New returns a UUID
 func New() UUID {
 	return NewRandom()
+}
+
+func BytesToUUID(b []byte) (u UUID) {
+	_ = b[15]
+	copy(u[:], b)
+	return u
 }
 
 func (u UUID) String() string {
