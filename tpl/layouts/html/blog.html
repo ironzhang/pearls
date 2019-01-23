@@ -1,0 +1,19 @@
+<html>
+	{{include "header.html" .}}
+	<body>
+		{{include "body.header.html" .}}
+		<main class="container-fluid">
+			<div class="row">
+				<div class="col-md-2">
+					{{.Toc}}
+				</div>
+				<div class="col-md-10">
+					<article class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content">
+						{{.Article}}
+					</article>
+				</div>
+			</div>
+		</main>
+	</body>
+</html>
+
